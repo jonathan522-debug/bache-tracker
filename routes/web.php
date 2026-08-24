@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Gestion\VerificacionController;
+use App\Http\Controllers\Gestion\ReporteController as GestionReporteController;
 
 
 Route::get('/', function () {
@@ -30,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('gestion')->name('gestion.')->middleware(['auth', 'role:Funcionario,Administrador'])->group(function () {
     Route::get('/verificaciones', [VerificacionController::class, 'index'])->name('verificaciones.index');
     Route::post('/verificaciones/{bache}', [VerificacionController::class, 'store'])->name('verificaciones.store');
+    Route::get('/reportes', [GestionReporteController::class, 'index'])->name('reportes.index');
 });
 
 // Panel Administrativo de Usuarios

@@ -67,6 +67,16 @@
                     <a href="{{ route('gestion.verificaciones.index') }}" class="block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
                         <span class="text-lg">✅</span> Verificar Baches
                     </a>
+                    <a href="{{ route('gestion.reportes.index') }}" class="block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
+                        <span class="text-lg">🗂️</span> Todos los Reportes
+                    </a>
+                @endif
+
+                @if(Auth::user()?->rol?->rol === 'Administrador')
+                    <!-- Panel Administrativo (solo Administrador) -->
+                    <a href="{{ route('admin.usuarios.index') }}" class="block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
+                        <span class="text-lg">⚙️</span> Panel de Administración
+                    </a>
                 @endif
 
                 <hr class="my-1 border-slate-100">
