@@ -64,4 +64,14 @@ class BacheController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function misReportes()
+    {
+        $reportes = Reporte::where('user_id', Auth::id())
+            ->with(['bache.estado', 'evidencias'])
+            ->latest('fecha')
+            ->get();
+
+        return view('baches.mis-reportes', compact('reportes'));
+    }
 }
