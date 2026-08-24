@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
         EstadoBache::create(['estado' => 'En Planificación', 'descripcion' => 'El bache ha sido incluido en un plan de acción operativo.']);
         EstadoBache::create(['estado' => 'En Reparación', 'descripcion' => 'La cuadrilla se encuentra trabajando en el lugar.']);
         EstadoBache::create(['estado' => 'Reparado', 'descripcion' => 'El bache ha sido solucionado exitosamente.']);
+        EstadoBache::create(['estado' => 'Rechazado', 'descripcion' => 'Se verificó y el bache no existe o el reporte es inválido.']);
 
         // 4. Severidades (Niveles de urgencia)
         Severidad::create(['nombre' => 'Leve', 'nivel' => 1]);

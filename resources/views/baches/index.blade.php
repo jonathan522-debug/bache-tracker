@@ -61,7 +61,14 @@
                 <a href="{{ route('reportes.personales') }}" class="block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
                     <span class="text-lg">📋</span> Mis Reportes
                 </a>
-                
+
+                @if(Auth::user()?->rol?->rol !== 'Ciudadano')
+                    <!-- Gestión Municipal (Funcionario/Administrador) -->
+                    <a href="{{ route('gestion.verificaciones.index') }}" class="block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
+                        <span class="text-lg">✅</span> Verificar Baches
+                    </a>
+                @endif
+
                 <hr class="my-1 border-slate-100">
                 
                 <!-- Cerrar Sesión (Debe ser un POST por seguridad en Laravel) -->
