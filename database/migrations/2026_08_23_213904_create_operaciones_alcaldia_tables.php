@@ -24,8 +24,8 @@ return new class extends Migration
             $table->timestamp('fecha_creacion')->useCurrent();
             $table->timestamp('fecha_inicio')->nullable();
             $table->timestamp('fecha_fin')->nullable();
-            $table->string('estado'); // Ej: Borrador, En Progreso, Finalizado
-            $table->foreignId('user_id')->constrained('users'); // Funcionario a cargo
+            $table->string('estado')->default('Borrador'); 
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
 
@@ -33,7 +33,7 @@ return new class extends Migration
         Schema::create('detalle_planes_accion', function (Blueprint $table) {
             $table->id();
             $table->foreignId('plan_id')->constrained('planes_accion')->onDelete('cascade');
-            $table->foreignId('bache_id')->constrained('baches');
+            $table->foreignId('bache_id')->constrained('baches')->onDelete('cascade');
             $table->integer('prioridad')->default(1); 
             $table->timestamp('fecha_estimada')->nullable();
             $table->text('observacion')->nullable();
