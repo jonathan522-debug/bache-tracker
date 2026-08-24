@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Gestion\VerificacionController;
 use App\Http\Controllers\Gestion\ReporteController as GestionReporteController;
+use App\Http\Controllers\Gestion\PlanAccionController;
 
 
 Route::get('/', function () {
@@ -32,6 +33,13 @@ Route::prefix('gestion')->name('gestion.')->middleware(['auth', 'role:Funcionari
     Route::get('/verificaciones', [VerificacionController::class, 'index'])->name('verificaciones.index');
     Route::post('/verificaciones/{bache}', [VerificacionController::class, 'store'])->name('verificaciones.store');
     Route::get('/reportes', [GestionReporteController::class, 'index'])->name('reportes.index');
+
+    Route::get('/planes', [PlanAccionController::class, 'index'])->name('planes.index');
+    Route::get('/planes/crear', [PlanAccionController::class, 'create'])->name('planes.create');
+    Route::post('/planes', [PlanAccionController::class, 'store'])->name('planes.store');
+    Route::get('/planes/{plan}', [PlanAccionController::class, 'show'])->name('planes.show');
+    Route::post('/planes/{plan}/baches', [PlanAccionController::class, 'agregarBache'])->name('planes.baches.store');
+    Route::patch('/planes/{plan}/estado', [PlanAccionController::class, 'updateEstado'])->name('planes.updateEstado');
 });
 
 // Panel Administrativo de Usuarios

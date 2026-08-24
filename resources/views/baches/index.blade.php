@@ -70,6 +70,9 @@
                     <a href="{{ route('gestion.reportes.index') }}" class="block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
                         <span class="text-lg">🗂️</span> Todos los Reportes
                     </a>
+                    <a href="{{ route('gestion.planes.index') }}" class="block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
+                        <span class="text-lg">🗺️</span> Planes de Acción
+                    </a>
                 @endif
 
                 @if(Auth::user()?->rol?->rol === 'Administrador')
