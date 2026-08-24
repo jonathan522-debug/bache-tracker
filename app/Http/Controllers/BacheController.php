@@ -19,7 +19,7 @@ class BacheController extends Controller
     public function misReportes()
     {
         // Obtenemos los reportes del usuario activo con su bache y evidencia asociada
-        $reportes = Reporte::with(['bache', 'evidencias'])
+        $reportes = Reporte::with(['bache.estado', 'evidencias'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
