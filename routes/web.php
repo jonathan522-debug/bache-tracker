@@ -18,10 +18,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Rutas de Google Socialite
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
-Route::get('/baches', function () {
-    return view('baches.index');
-})->middleware('auth'); // Protegido para que solo entren usuarios logueados
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/baches', [BacheController::class, 'index'])->name('baches.index');
+    Route::post('/baches/reportar', [BacheController::class, 'store'])->name('baches.store');
+    Route::get('/mi-perfil', [UserController::class, 'perfil'])->name('perfil.index');
+    Route::get('/mis-reportes', [BacheController::class, 'misReportes'])->name('reportes.personales');
+});
 
 // Panel Administrativo de Usuarios
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
