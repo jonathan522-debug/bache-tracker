@@ -252,40 +252,51 @@ function bacheApp() {
         },
 
         initMap() {
-            this.map = L.map('map', { zoomControl: true }).setView([-17.7833, -63.1821], 13);
+    this.map = L.map('map', { zoomControl: true }).setView([-17.7833, -63.1821], 13);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap'
-            }).addTo(this.map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(this.map);
 
-            // 1. Cargamos los baches reales usando json_encode de forma segura
-            const bachesReales = {!! json_encode($baches) !!};
+    const bachesReales = {!! json_encode($baches) !!};
 
-            // 2. Iteramos sobre los baches reales para ponerlos en el mapa
-            bachesReales.forEach(bache => {
-                const icon = L.divIcon({
-                    className: 'custom-pin',
-                    // Icono de advertencia para baches reportados
-                    html: `<div class="bg-rose-500 w-8 h-8 rounded-full border-2 border-white text-white font-bold text-sm flex items-center justify-center shadow-md">⚠️</div>`,
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
-                });
-                
-                L.marker([bache.latitud, bache.longitud], { icon: icon })
-                .addTo(this.map)
-                .bindPopup(`
-                    <div class="text-sm">
-                        <b>Bache #${bache.id}</b><br>
-                        <span class="text-xs text-gray-500">${bache.referencia || 'Sin referencia'}</span>
-                    </div>
-                `);
-            });
+    bachesReales.forEach(bache => {
+        // Obtenemos el número de reportes (si no viene definido, asumimos al menos 1)
+        const totalReportes = bache.reportes_count || 1;
 
-            this.map.on('click', (e) => {
-                this.seleccionarUbicacion(e.latlng.lat, e.latlng.lng);
-            });
-        },
+        // Lógica de color dinámico: Empieza en amarillo y se vuelve más rojo conforme aumentan los reportes
+        // 1 reporte = Amarillo cálido (#eab308)
+        // 5+ reportes = Rojo oscuro / Alerta máxima (#dc2626)
+        let colorClase = 'bg-amber-400'; // Amarillo por defecto
+        if (totalReportes >= 3 && totalReportes < 5) {
+            colorClase = 'bg-orange-500'; // Naranja
+        } else if (totalReportes >= 5) {
+            colorClase = 'bg-rose-600'; // Rojo intenso
+        }
+
+        const icon = L.divIcon({
+            className: 'custom-pin',
+            html: `<div class="${colorClase} w-8 h-8 rounded-full border-2 border-white text-white font-bold text-xs flex items-center justify-center shadow-md">${totalReportes}</div>`,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+        
+        L.marker([bache.latitud, bache.longitud], { icon: icon })
+         .addTo(this.map)
+         .bindPopup(`
+            <div class="text-sm">
+                <b>Bache #${bache.id}</b><br>
+                <span class="text-xs font-semibold text-rose-600">⚠️ ${totalReportes} reporte(s) en esta zona</span><br>
+                <span class="text-xs text-gray-500">${bache.referencia || 'Sin referencia'}</span>
+            </div>
+         `);
+    });
+
+    this.map.on('click', (e) => {
+        this.seleccionarUbicacion(e.latlng.lat, e.latlng.lng);
+    });
+},
         seleccionarUbicacion(lat, lng) {
             this.selectedLat = lat;
             this.selectedLng = lng;

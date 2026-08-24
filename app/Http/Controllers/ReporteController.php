@@ -14,21 +14,21 @@ class ReporteController extends Controller
 {
     public function store(Request $request)
     {
-        // 1. Validar la entrada (el ciudadano puede no estar autenticado inicialmente, pero asumimos que tenemos sus datos o id)
         $validated = $request->validate([
             'latitud' => 'required|numeric',
             'longitud' => 'required|numeric',
-            'descripcion' => 'required|string|max:500',
-            'foto' => 'required|image|mimes:jpeg,png,jpg|max:10240', // Máx 10MB
-            'calle' => 'nullable|string',
-            'referencia' => 'nullable|string',
+            'descripcion' => 'nullable|string|max:500',
+            'referencia' => 'required|string|max:255',
+            'foto' => 'required|image|mimes:jpeg,png,jpg|max:10240',
         ]);
 
         $lat = $validated['latitud'];
         $lng = $validated['longitud'];
-        $toleranciaMetros = 30; // Tolerancia de 30 metros para agrupar reportes
+        
+        // REQUISITO: Tolerancia exacta de 8 metros para evitar duplicados
+        $toleranciaMetros = 8; 
 
-        // 2. Búsqueda Geoespacial Optimizada (Fórmula de Haversine en SQL)
+        // Búsqueda espacial mediante Haversine en SQL
         $bacheCercano = Bache::select('id')
             ->selectRaw("( 6371000 * acos( cos( radians(?) ) * cos( radians( latitud ) ) * cos( radians( longitud ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitud ) ) ) ) AS distance", [$lat, $lng, $lat])
             ->having('distance', '<', $toleranciaMetros)
@@ -38,30 +38,25 @@ class ReporteController extends Controller
         DB::beginTransaction();
 
         try {
-            // 3. Crear o asociar el Bache
             if ($bacheCercano) {
                 $bacheId = $bacheCercano->id;
             } else {
-                // Asumimos que el ID 1 es "Reportado" en tu catálogo de EstadoBache
                 $nuevoBache = Bache::create([
-                    'estado_id' => 1,
+                    'estado_id' => 1, // Pendiente
                     'latitud' => $lat,
                     'longitud' => $lng,
-                    'calle' => $validated['calle'] ?? null,
-                    'referencia' => $validated['referencia'] ?? null,
+                    'referencia' => $validated['referencia'],
                 ]);
                 $bacheId = $nuevoBache->id;
             }
 
-            // 4. Registrar el Reporte
             $reporte = Reporte::create([
-                'user_id' => auth()->id() ?? 1, // Ajustar según tu lógica de Auth
+                'user_id' => auth()->id(),
                 'bache_id' => $bacheId,
-                'descripcion' => $validated['descripcion'],
+                'descripcion' => $validated['descripcion'] ?? 'Reporte ciudadano',
                 'fecha' => now(),
             ]);
 
-            // 5. Guardar la Evidencia Fotográfica
             if ($request->hasFile('foto')) {
                 $rutaImagen = $request->file('foto')->store('evidencias', 'public');
                 Evidencia::create([

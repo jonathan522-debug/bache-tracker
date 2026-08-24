@@ -8,6 +8,7 @@ use App\Models\Genero;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -18,6 +19,11 @@ class UserController extends Controller
     {
         $usuarios = User::with(['rol', 'genero'])->get();
         return view('admin.usuarios.index', compact('usuarios'));
+    }
+    public function perfil()
+    {
+        $user = Auth::user();
+        return view('perfil.index', compact('user'));
     }
 
     /**

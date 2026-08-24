@@ -16,6 +16,16 @@ class BacheController extends Controller
         $baches = Bache::select('id', 'latitud', 'longitud', 'referencia', 'estado_id')->get();
         return view('baches.index', compact('baches')); 
     }
+    public function misReportes()
+    {
+        // Obtenemos los reportes del usuario activo con su bache y evidencia asociada
+        $reportes = Reporte::with(['bache', 'evidencias'])
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('baches.mis-reportes', compact('reportes'));
+    }
     public function store(Request $request)
     {
         $request->validate([
@@ -65,13 +75,4 @@ class BacheController extends Controller
         }
     }
 
-    public function misReportes()
-    {
-        $reportes = Reporte::where('user_id', Auth::id())
-            ->with(['bache.estado', 'evidencias'])
-            ->latest('fecha')
-            ->get();
-
-        return view('baches.mis-reportes', compact('reportes'));
-    }
 }
