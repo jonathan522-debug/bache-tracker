@@ -35,7 +35,7 @@ return new class extends Migration
             $table->foreignId('plan_id')->constrained('planes_accion')->onDelete('cascade');
             $table->foreignId('bache_id')->constrained('baches');
             $table->integer('prioridad')->default(1); 
-            $table->timestamp('fecha_programada')->nullable();
+            $table->timestamp('fecha_estimada')->nullable();
             $table->text('observacion')->nullable();
             $table->timestamps();
         });

@@ -34,7 +34,7 @@ class AuthController extends Controller
 
     public function handleGoogleCallback()
     {
-        try {
+        //try {
             $googleUser = Socialite::driver('google')->user();
             
             $user = User::firstOrCreate(
@@ -53,9 +53,9 @@ class AuthController extends Controller
             // Redirección temporal solicitada hacia la vista de baches
             return redirect()->to('/baches');
 
-        } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Ocurrió un problema al vincular tu cuenta de Google.');
-        }
+        //} catch (\Exception $e) {
+        //    return redirect('/login')->with('error', 'Ocurrió un problema al vincular tu cuenta de Google.');
+        //}
     }
 
     /**
