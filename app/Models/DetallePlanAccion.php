@@ -12,12 +12,12 @@ class DetallePlanAccion extends Model
         'plan_id',
         'bache_id',
         'prioridad',
-        'fecha_programada',
+        'fecha_estimada',
         'observacion'
     ];
 
     protected $casts = [
-        'fecha_programada' => 'datetime',
+        'fecha_estimada' => 'datetime',
     ];
 
     // RELACIONES

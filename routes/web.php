@@ -6,6 +6,10 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 
 
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
 // Rutas de Autenticación Tradicional y Social
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login'); // O tu vista de login
 Route::post('/login', [AuthController::class, 'login']);
