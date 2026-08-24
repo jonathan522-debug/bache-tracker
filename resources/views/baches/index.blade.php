@@ -233,16 +233,15 @@ function bacheApp() {
         coordenadasTexto: '-17.7833, -63.1821',
         drawerOpen: false,
         paso: 1,
-        // Variables nuevas para el manejo de archivos
         fotoCargada: false,
         fotoArchivo: null,
         fotoPreview: null,
         cargando: false, 
         modalExito: false,
         form: {
-            nombre: '{{ Auth::user()->nombre ?? "Usuario" }}', // Obtiene el nombre del usuario logueado
+            nombre: '{{ Auth::user()->nombre ?? "Usuario" }}', 
             telefono: '{{ Auth::user()->telefono ?? "" }}',
-            referencia: '' // Limpio por defecto para que el usuario lo llene
+            referencia: ''
         },
 
         initMap() {
@@ -253,27 +252,33 @@ function bacheApp() {
                 attribution: '© OpenStreetMap'
             }).addTo(this.map);
 
-            const puntosPrueba = [
-                { lat: -17.7780, lng: -63.1810, count: 12 },
-                { lat: -17.7950, lng: -63.1650, count: 5 },
-                { lat: -17.7650, lng: -63.1950, count: 18 }
-            ];
+            // 1. Cargamos los baches reales usando json_encode de forma segura
+            const bachesReales = {!! json_encode($baches) !!};
 
-            puntosPrueba.forEach(p => {
+            // 2. Iteramos sobre los baches reales para ponerlos en el mapa
+            bachesReales.forEach(bache => {
                 const icon = L.divIcon({
                     className: 'custom-pin',
-                    html: `<div class="bg-rose-500 w-8 h-8 rounded-full border-2 border-white text-white font-bold text-xs flex items-center justify-center shadow-md">${p.count}</div>`,
+                    // Icono de advertencia para baches reportados
+                    html: `<div class="bg-rose-500 w-8 h-8 rounded-full border-2 border-white text-white font-bold text-sm flex items-center justify-center shadow-md">⚠️</div>`,
                     iconSize: [32, 32],
                     iconAnchor: [16, 16]
                 });
-                L.marker([p.lat, p.lng], { icon: icon }).addTo(this.map);
+                
+                L.marker([bache.latitud, bache.longitud], { icon: icon })
+                .addTo(this.map)
+                .bindPopup(`
+                    <div class="text-sm">
+                        <b>Bache #${bache.id}</b><br>
+                        <span class="text-xs text-gray-500">${bache.referencia || 'Sin referencia'}</span>
+                    </div>
+                `);
             });
 
             this.map.on('click', (e) => {
                 this.seleccionarUbicacion(e.latlng.lat, e.latlng.lng);
             });
         },
-
         seleccionarUbicacion(lat, lng) {
             this.selectedLat = lat;
             this.selectedLng = lng;
@@ -296,7 +301,6 @@ function bacheApp() {
             this.drawerOpen = true;
             this.paso = 1;
             
-            // Reiniciar estado de imagen si se selecciona otro punto nuevo
             this.fotoCargada = false;
             this.fotoArchivo = null;
             this.fotoPreview = null;
@@ -314,7 +318,6 @@ function bacheApp() {
             }
         },
 
-        // --- FUNCIÓN NUEVA: Maneja el archivo desde el input ---
         cargarFotoReal(event) {
             const file = event.target.files[0];
             if (file) {
@@ -324,7 +327,6 @@ function bacheApp() {
             }
         },
 
-        // --- FUNCIÓN MODIFICADA: Envía los datos reales al Backend ---
         async finalizarReporte() {
             if (!this.form.referencia) {
                 alert("Por favor, ingresa una referencia para ayudar a ubicar el bache.");
@@ -333,16 +335,14 @@ function bacheApp() {
 
             this.cargando = true;
             
-            // Empaquetar todo en un FormData (permite envío de archivos)
             let formData = new FormData();
             formData.append('latitud', this.selectedLat);
             formData.append('longitud', this.selectedLng);
             formData.append('referencia', this.form.referencia);
             formData.append('foto', this.fotoArchivo);
-            formData.append('_token', '{{ csrf_token() }}'); // Token de seguridad de Laravel
+            formData.append('_token', '{{ csrf_token() }}'); 
 
             try {
-                // Hacemos la petición a la ruta que configuraste en web.php
                 let response = await fetch('{{ route("baches.store") }}', {
                     method: 'POST',
                     body: formData
@@ -354,11 +354,11 @@ function bacheApp() {
                     this.drawerOpen = false;
                     this.modalExito = true;
 
-                    // Reemplazamos el pin temporal animado por uno estático definitivo
                     if (this.tempMarker) {
                         this.map.removeLayer(this.tempMarker);
                     }
 
+                    // Coloca el icono de "NUEVO"
                     const newIcon = L.divIcon({
                         className: 'final-pin',
                         html: `<div class="bg-emerald-600 w-9 h-9 rounded-full border-2 border-white text-white font-bold text-xs flex items-center justify-center shadow-lg">NUEVO</div>`,

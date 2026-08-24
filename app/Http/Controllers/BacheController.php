@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class BacheController extends Controller
 {
+    public function index()
+    {
+        $baches = Bache::select('id', 'latitud', 'longitud', 'referencia', 'estado_id')->get();
+        return view('baches.index', compact('baches')); 
+    }
     public function store(Request $request)
     {
         $request->validate([
