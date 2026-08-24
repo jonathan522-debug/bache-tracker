@@ -33,7 +33,7 @@ Route::prefix('gestion')->name('gestion.')->middleware(['auth', 'role:Funcionari
 });
 
 // Panel Administrativo de Usuarios
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Administrador'])->group(function () {
     Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
     Route::get('/usuarios/crear', [UserController::class, 'create'])->name('usuarios.create'); // Nueva vista
     Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
