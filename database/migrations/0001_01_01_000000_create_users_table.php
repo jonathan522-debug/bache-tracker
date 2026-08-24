@@ -30,7 +30,7 @@ return new class extends Migration
             $table->foreignId('genero_id')->nullable()->constrained('generos');
             
             $table->string('nombre');
-            $table->string('correo')->unique(); // Reemplaza al 'email' por defecto
+            $table->string('correo')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             

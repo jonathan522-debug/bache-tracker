@@ -20,7 +20,10 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt(['correo' => $credentials['correo'], 'password' => $credentials['password'], 'activo' => true])) {
+        if (Auth::attempt([
+            'correo' => $credentials['correo'],
+            'password' => $credentials['password'],
+            'activo' => true])) {
             $request->session()->regenerate();
             
             // Redirección temporal solicitada hacia la ruta o vista de baches
