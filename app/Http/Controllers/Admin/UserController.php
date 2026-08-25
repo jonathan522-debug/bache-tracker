@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Models\User;
 use App\Models\Rol;
 use App\Models\Genero;
+use App\Models\Reporte;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -23,7 +25,18 @@ class UserController extends Controller
     public function perfil()
     {
         $user = Auth::user();
-        return view('perfil.index', compact('user'));
+
+        // Reportes cuyo bache aún no tiene verificaciones
+        $reportesSinVerificar = $user->reportes()
+            ->whereDoesntHave('bache.verificaciones')
+            ->count();
+
+        // Reportes cuyo bache ya cuenta con al menos una verificación
+        $reportesVerificados = $user->reportes()
+            ->whereHas('bache.verificaciones')
+            ->count();
+
+        return view('perfil.index', compact('user', 'reportesSinVerificar', 'reportesVerificados'));
     }
 
     /**
@@ -83,6 +96,22 @@ class UserController extends Controller
         return redirect()->route('admin.usuarios.index')->with('success', 'Rol de usuario actualizado correctamente.');
     }
 
+    public function updatePerfil(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'correo' => ['required', 'email', 'max:255', Rule::unique('users', 'correo')->ignore($user->id)],
+            'telefono' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $user->update([
+            'correo' => $request->correo,
+            'telefono' => $request->telefono,
+        ]);
+
+        return redirect()->back()->with('success', 'Perfil actualizado con éxito.');
+    }
     /**
      * 5. Dar de baja o reactivar
      */

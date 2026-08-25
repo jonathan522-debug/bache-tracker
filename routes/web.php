@@ -25,7 +25,8 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 Route::middleware(['auth'])->group(function () {
     Route::get('/baches', [BacheController::class, 'index'])->name('baches.index');
     Route::post('/baches/reportar', [BacheController::class, 'store'])->name('baches.store');
-    Route::get('/mi-perfil', [UserController::class, 'perfil'])->name('perfil.index');
+    Route::get('/perfil', [UserController::class, 'perfil'])->name('perfil.index');
+    Route::put('/perfil', [UserController::class, 'updatePerfil'])->name('perfil.update');
     Route::get('/mis-reportes', [BacheController::class, 'misReportes'])->name('reportes.personales');
 });
 

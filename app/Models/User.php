@@ -61,4 +61,8 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Genero::class);
     }
+    public function reportes()
+    {
+        return $this->hasMany(Reporte::class);
+    }
 }
