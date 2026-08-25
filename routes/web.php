@@ -14,13 +14,14 @@ Route::get('/', function () {
 });
 
 // Rutas de Autenticación Tradicional y Social
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login'); // O tu vista de login
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rutas de Google Socialite
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/baches', [BacheController::class, 'index'])->name('baches.index');
     Route::post('/baches/reportar', [BacheController::class, 'store'])->name('baches.store');

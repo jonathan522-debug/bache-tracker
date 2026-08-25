@@ -18,15 +18,11 @@ class Bache extends Model
         'referencia'
     ];
 
-    /**
-     * Cast de atributos para asegurar tipos de datos correctos.
-     */
     protected $casts = [
         'latitud' => 'float',
         'longitud' => 'float',
     ];
 
-    // RELACIONES
 
     // Un bache pertenece a un estado actual
     public function estado()

@@ -37,9 +37,10 @@ class AuthController extends Controller
 
     public function handleGoogleCallback()
     {
-        //try {
-            $googleUser = Socialite::driver('google')->user();
-            
+        try {
+            // Opción recomendada para evitar fallos de estado/sesión en móviles: stateless()
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
             $user = User::firstOrCreate(
                 ['correo' => $googleUser->getEmail()],
                 [
@@ -47,18 +48,20 @@ class AuthController extends Controller
                     'google_id' => $googleUser->getId(),
                     'rol_id' => 1, // Ciudadano por defecto
                     'password' => null,
-                    'activo' => true
+                    'activo' => true,
                 ]
             );
 
-            Auth::login($user, true);
+            auth()->login($user);
 
-            // Redirección temporal solicitada hacia la vista de baches
-            return redirect()->to('/baches');
+            return redirect()->intended('/baches');
 
-        //} catch (\Exception $e) {
-        //    return redirect('/login')->with('error', 'Ocurrió un problema al vincular tu cuenta de Google.');
-        //}
+        } catch (InvalidStateException $e) {
+            // Si la sesión caduca o hay desajuste de estado, lo mandamos al login con un mensaje limpio
+            return redirect()->route('login')->with('error', 'La sesión de autenticación expiró. Por favor, intenta iniciar sesión de nuevo.');
+        } catch (Exception $e) {
+            return redirect()->route('login')->with('error', 'Ocurrió un error al intentar iniciar sesión con Google.');
+        }
     }
 
     /**

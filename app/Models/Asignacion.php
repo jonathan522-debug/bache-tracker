@@ -21,8 +21,6 @@ class Asignacion extends Model
         'fecha_programada' => 'datetime',
     ];
 
-    // RELACIONES
-
     public function detallePlan()
     {
         return $this->belongsTo(DetallePlanAccion::class, 'detalle_plan_id');
