@@ -14,7 +14,6 @@
         <div class="text-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">ReportaSCZ</h1>
             <p class="text-sm text-gray-500 mt-1">Gestión y reporte ciudadano de baches</p>
-            <p class="text-xs text-emerald-600 font-semibold mt-1">holaaaa</p>
         </div>
 
         <!-- Mensajes de Error o Alerta -->
