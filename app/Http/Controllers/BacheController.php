@@ -13,8 +13,15 @@ class BacheController extends Controller
 {
     public function index()
     {
-        $baches = Bache::select('id', 'latitud', 'longitud', 'referencia', 'estado_id')->get();
-        return view('baches.index', compact('baches')); 
+        // Solo mostramos en el mapa los baches "activos". Los estados finales
+        // (Reparado / Rechazado) se ocultan porque ya no requieren atención.
+        $estadosVisibles = ['Reportado', 'Verificado', 'En Planificación', 'En Reparación'];
+
+        $baches = Bache::select('id', 'latitud', 'longitud', 'referencia', 'estado_id')
+            ->whereHas('estado', fn ($q) => $q->whereIn('estado', $estadosVisibles))
+            ->get();
+
+        return view('baches.index', compact('baches'));
     }
     public function misReportes()
     {

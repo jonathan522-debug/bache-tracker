@@ -41,6 +41,7 @@ Route::prefix('gestion')->name('gestion.')->middleware(['auth', 'role:Funcionari
     Route::post('/planes', [PlanAccionController::class, 'store'])->name('planes.store');
     Route::get('/planes/{plan}', [PlanAccionController::class, 'show'])->name('planes.show');
     Route::post('/planes/{plan}/baches', [PlanAccionController::class, 'agregarBache'])->name('planes.baches.store');
+    Route::patch('/planes/{plan}/baches/{bache}/reparar', [PlanAccionController::class, 'marcarReparado'])->name('planes.baches.reparar');
     Route::patch('/planes/{plan}/estado', [PlanAccionController::class, 'updateEstado'])->name('planes.updateEstado');
 });
 

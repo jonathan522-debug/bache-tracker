@@ -60,6 +60,7 @@
                         <th class="p-3">Fecha estimada</th>
                         <th class="p-3">Observación</th>
                         <th class="p-3">Estado actual</th>
+                        <th class="p-3">Acción</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
@@ -73,10 +74,26 @@
                             <td class="p-3 text-gray-600">{{ $detalle->fecha_estimada?->format('d/m/Y') ?? '—' }}</td>
                             <td class="p-3 text-gray-600">{{ $detalle->observacion ?? '—' }}</td>
                             <td class="p-3 text-gray-600">{{ $detalle->bache?->estado?->estado }}</td>
+                            <td class="p-3">
+                                @if($detalle->bache && $detalle->bache->estado?->estado === 'Reparado')
+                                    <span class="text-xs font-semibold text-green-600">✓ Reparado</span>
+                                @elseif($detalle->bache)
+                                    <form action="{{ route('gestion.planes.baches.reparar', [$plan, $detalle->bache]) }}" method="POST"
+                                          onsubmit="return confirm('¿Marcar este bache como reparado? Dejará de aparecer en el mapa.');">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-700 whitespace-nowrap">
+                                            Marcar reparado
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-xs text-gray-400">—</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="p-4 text-center text-gray-500">Todavía no se agregaron baches a este plan.</td>
+                            <td colspan="6" class="p-4 text-center text-gray-500">Todavía no se agregaron baches a este plan.</td>
                         </tr>
                     @endforelse
                 </tbody>

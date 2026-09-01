@@ -98,9 +98,61 @@ class PlanAccionController extends Controller
             'estado' => ['required', 'in:Borrador,En Progreso,Finalizado'],
         ]);
 
-        $plan->estado = $validated['estado'];
-        $plan->save();
+        DB::transaction(function () use ($plan, $validated) {
+            $plan->estado = $validated['estado'];
+            $plan->save();
+
+            // Al finalizar el plan, todos sus baches pasan a "Reparado" y
+            // dejan de mostrarse en el mapa público.
+            if ($validated['estado'] === 'Finalizado') {
+                $estadoReparado = EstadoBache::where('estado', 'Reparado')->firstOrFail();
+
+                $plan->load('detalles.bache');
+
+                foreach ($plan->detalles as $detalle) {
+                    if ($detalle->bache) {
+                        $this->marcarBacheReparado($detalle->bache, $estadoReparado);
+                    }
+                }
+            }
+        });
 
         return redirect()->route('gestion.planes.show', $plan)->with('success', 'Estado del plan actualizado correctamente.');
+    }
+
+    /**
+     * Marca un bache concreto del plan como reparado (deja de aparecer en el mapa).
+     */
+    public function marcarReparado(PlanAccion $plan, Bache $bache)
+    {
+        $estadoReparado = EstadoBache::where('estado', 'Reparado')->firstOrFail();
+
+        if ($bache->estado_id === $estadoReparado->id) {
+            return redirect()->route('gestion.planes.show', $plan)->with('success', 'El bache ya estaba marcado como reparado.');
+        }
+
+        DB::transaction(fn () => $this->marcarBacheReparado($bache, $estadoReparado));
+
+        return redirect()->route('gestion.planes.show', $plan)->with('success', 'Bache marcado como reparado.');
+    }
+
+    /**
+     * Cambia el estado del bache a "Reparado" y deja constancia en el historial.
+     */
+    private function marcarBacheReparado(Bache $bache, EstadoBache $estadoReparado): void
+    {
+        if ($bache->estado_id === $estadoReparado->id) {
+            return;
+        }
+
+        $bache->estado_id = $estadoReparado->id;
+        $bache->save();
+
+        HistorialEstado::create([
+            'bache_id' => $bache->id,
+            'estado_id' => $estadoReparado->id,
+            'user_id' => auth()->id(),
+            'fecha' => now(),
+        ]);
     }
 }
