@@ -5,7 +5,7 @@
 
     <!-- Cabecera flotante -->
     <header class="absolute top-4 left-4 right-4 z-30 flex flex-row items-start justify-between gap-3 pointer-events-none">
-        
+
         <!-- Lado Izquierdo: Título -->
         <div class="bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-lg border border-emerald-100 flex items-center justify-between w-auto pointer-events-auto">
             <div class="flex items-center gap-2">
@@ -21,14 +21,16 @@
 
         <!-- Lado Derecho: Menú de Usuario -->
         <div class="pointer-events-auto flex items-center gap-3">
+            @if(Auth::user()?->rol?->rol !== 'Administrador')
             <div class="bg-slate-900/80 backdrop-blur-md text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium hidden md:flex items-center gap-2 border border-slate-700">
                 <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/></svg>
                 <span>Clic en el mapa para marcar</span>
             </div>
+            @endif
 
             <!-- Menú Desplegable Alpine -->
             <div x-data="{ menuOpen: false }" class="relative">
-                <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false" 
+                <button @click="menuOpen = !menuOpen" @click.away="menuOpen = false"
                         class="bg-white/90 backdrop-blur-md px-3 py-2 rounded-2xl shadow-lg border border-slate-200 flex items-center gap-2 hover:bg-slate-50 transition active:scale-95">
                     <div class="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold uppercase">
                         {{ substr(Auth::user()->nombre ?? 'U', 0, 1) }}
@@ -39,7 +41,7 @@
                     <svg class="w-4 h-4 text-slate-500" :class="{'rotate-180': menuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="transition: transform 0.2s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </button>
 
-                <div x-show="menuOpen" 
+                <div x-show="menuOpen"
                      x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 translate-y-[-10px]"
                      x-transition:enter-end="opacity-100 translate-y-0"
@@ -48,16 +50,18 @@
                      x-transition:leave-end="opacity-0 translate-y-[-10px]"
                      class="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden py-2"
                      style="display: none;">
-                    
+
                     <a href="{{ route('perfil.index') }}" class="group block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
                         <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                         Mi Perfil
                     </a>
-                    
+
+                    @if(Auth::user()?->rol?->rol !== 'Administrador')
                     <a href="{{ route('reportes.personales') }}" class="group block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
                         <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         Mis Reportes
                     </a>
+                    @endif
 
                     @if(Auth::user()?->rol?->rol !== 'Ciudadano')
                         <a href="{{ route('gestion.verificaciones.index') }}" class="group block px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-3">
@@ -82,7 +86,7 @@
                     @endif
 
                     <hr class="my-1 border-slate-100">
-                    
+
                     <form method="POST" action="{{ route('logout') }}" class="m-0">
                         @csrf
                         <button type="submit" class="group w-full text-left px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition flex items-center gap-3">
@@ -99,8 +103,9 @@
     <div id="map" class="h-full w-full z-10 cursor-crosshair"></div>
 
     <!-- Botón Flotante Inferior -->
+    @if(Auth::user()?->rol?->rol !== 'Administrador')
     <div x-show="!drawerOpen" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
-        <button @click="abrirFlujoSinPunto()" 
+        <button @click="abrirFlujoSinPunto()"
                 class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold px-7 py-4 rounded-full shadow-2xl flex items-center gap-3 transition-all duration-200 group border-2 border-emerald-400/30">
             <span class="bg-emerald-500/80 p-1.5 rounded-full group-hover:rotate-90 transition-transform duration-300">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
@@ -108,9 +113,10 @@
             <span class="text-base tracking-wide">Reportar bache aquí</span>
         </button>
     </div>
+    @endif
 
     <!-- Panel Lateral Fix Móvil -->
-    <div x-show="drawerOpen" 
+    <div x-show="drawerOpen"
          x-transition:enter="transition transform ease-out duration-300"
          x-transition:enter-start="translate-x-full"
          x-transition:enter-end="translate-x-0"
@@ -119,7 +125,7 @@
          x-transition:leave-end="translate-x-full"
          class="fixed top-0 right-0 w-full md:w-[420px] h-dvh max-h-dvh bg-white z-40 shadow-2xl rounded-l-3xl flex flex-col border-l border-slate-100 overflow-hidden"
          style="display: none;">
-        
+
         <div class="p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
             <div>
                 <h2 class="font-bold text-slate-800 text-lg">Reportar nuevo bache</h2>
@@ -131,7 +137,7 @@
         </div>
 
         <div class="p-6 flex-1 overflow-y-auto">
-            
+
             <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-2xl mb-5 flex items-start gap-3">
                 <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 <div class="text-xs">
@@ -144,12 +150,12 @@
             <!-- PASO 1: Subir Foto -->
             <div x-show="paso === 1" class="space-y-5">
                 <p class="text-sm text-slate-600">Adjunta una fotografía real para verificar la dimensión del bache.</p>
-                
+
                 <input type="file" x-ref="fotoInput" @change="cargarFotoReal" accept="image/*" class="hidden">
 
-                <div @click="$refs.fotoInput.click()" 
+                <div @click="$refs.fotoInput.click()"
                      class="border-2 border-dashed border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50 rounded-2xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center gap-3 group">
-                    
+
                     <template x-if="!fotoCargada">
                         <div class="flex flex-col items-center gap-2">
                             <div class="bg-emerald-100 text-emerald-600 p-4 rounded-full group-hover:scale-110 transition-transform">
@@ -159,7 +165,7 @@
                             <span class="text-xs text-slate-400">JPG, PNG hasta 10MB</span>
                         </div>
                     </template>
-                    
+
                     <template x-if="fotoCargada">
                         <div class="relative w-full h-40 rounded-xl overflow-hidden shadow-md">
                             <img :src="fotoPreview" class="w-full h-full object-cover" alt="Bache fotografiado">
@@ -195,20 +201,20 @@
         <!-- Controles Inferiores -->
         <div class="p-5 border-t border-slate-100 bg-white shrink-0">
             <template x-if="paso === 1">
-                <button @click="paso = 2" 
+                <button @click="paso = 2"
                         :disabled="!fotoCargada"
                         :class="fotoCargada ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
                         class="w-full py-3.5 rounded-xl font-bold transition shadow-lg text-sm">
                     Siguiente
                 </button>
             </template>
-            
+
             <template x-if="paso === 2">
                 <div class="flex gap-2">
                     <button @click="paso = 1" :disabled="cargando" class="w-1/3 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-sm transition">
                         Atrás
                     </button>
-                    <button @click="finalizarReporte()" 
+                    <button @click="finalizarReporte()"
                             :disabled="cargando"
                             :class="cargando ? 'bg-emerald-400 cursor-wait' : 'bg-emerald-600 hover:bg-emerald-700'"
                             class="w-2/3 py-3.5 text-white font-bold rounded-xl shadow-lg text-sm transition flex justify-center items-center gap-2">
@@ -221,7 +227,7 @@
     </div>
 
     <!-- Modal de Éxito -->
-    <div x-show="modalExito" 
+    <div x-show="modalExito"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
          style="display: none;">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl space-y-4">
@@ -242,7 +248,7 @@
 function bacheApp() {
     return {
         map: null,
-        tempMarker: null, 
+        tempMarker: null,
         selectedLat: -17.7833,
         selectedLng: -63.1821,
         ubicacionTexto: 'Av. Cristóbal de Mendoza, Santa Cruz',
@@ -252,10 +258,11 @@ function bacheApp() {
         fotoCargada: false,
         fotoArchivo: null,
         fotoPreview: null,
-        cargando: false, 
+        cargando: false,
         modalExito: false,
+        esAdmin: {{ Auth::user()?->rol?->rol === 'Administrador' ? 'true' : 'false' }},
         form: {
-            nombre: '{{ Auth::user()->nombre ?? "Usuario" }}', 
+            nombre: '{{ Auth::user()->nombre ?? "Usuario" }}',
             telefono: '{{ Auth::user()->telefono ?? "" }}',
             referencia: ''
         },
@@ -312,10 +319,10 @@ function bacheApp() {
                     iconSize: [24, 24],
                     iconAnchor: [12, 12]
                 });
-                
-                const marker = L.marker([bache.latitud, bache.longitud], { 
+
+                const marker = L.marker([bache.latitud, bache.longitud], {
                     icon: icon,
-                    reportesCount: totalReportes 
+                    reportesCount: totalReportes
                 }).bindPopup(`
                     <div class="text-sm">
                         <b>Bache #${bache.id}</b><br>
@@ -330,6 +337,7 @@ function bacheApp() {
             this.map.addLayer(clusterGroup);
 
             this.map.on('click', (e) => {
+                if (this.esAdmin) return;
                 this.seleccionarUbicacion(e.latlng.lat, e.latlng.lng);
             });
         },
@@ -355,7 +363,7 @@ function bacheApp() {
 
             this.drawerOpen = true;
             this.paso = 1;
-            
+
             this.fotoCargada = false;
             this.fotoArchivo = null;
             this.fotoPreview = null;
@@ -389,22 +397,22 @@ function bacheApp() {
             }
 
             this.cargando = true;
-            
+
             let formData = new FormData();
             formData.append('latitud', this.selectedLat);
             formData.append('longitud', this.selectedLng);
             formData.append('referencia', this.form.referencia);
             formData.append('foto', this.fotoArchivo);
-            formData.append('_token', '{{ csrf_token() }}'); 
+            formData.append('_token', '{{ csrf_token() }}');
 
             try {
                 let response = await fetch('{{ route("baches.store") }}', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 let result = await response.json();
-                
+
                 if (response.ok) {
                     this.drawerOpen = false;
                     this.modalExito = true;
