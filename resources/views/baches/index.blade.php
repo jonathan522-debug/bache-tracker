@@ -320,16 +320,21 @@ function bacheApp() {
                     iconAnchor: [12, 12]
                 });
 
+                const foto = bache.foto_url
+                    ? `<img src="${bache.foto_url}" alt="Foto del bache #${bache.id}" style="width:100%;height:130px;object-fit:cover;border-radius:8px;margin-bottom:8px;display:block;" loading="lazy">`
+                    : `<div style="width:100%;height:130px;border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;background:#f1f5f9;color:#94a3b8;font-size:11px;">Sin foto</div>`;
+
                 const marker = L.marker([bache.latitud, bache.longitud], {
                     icon: icon,
                     reportesCount: totalReportes
                 }).bindPopup(`
-                    <div class="text-sm">
+                    <div class="text-sm" style="width:220px;">
+                        ${foto}
                         <b>Bache #${bache.id}</b><br>
                         <span class="text-xs font-semibold text-rose-600">${totalReportes} reporte(s) registrado(s)</span><br>
                         <span class="text-xs text-gray-500">${bache.referencia || 'Sin referencia'}</span>
                     </div>
-                `);
+                `, { minWidth: 220, maxWidth: 240 });
 
                 clusterGroup.addLayer(marker);
             });

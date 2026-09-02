@@ -8,6 +8,7 @@ use App\Models\Evidencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BacheController extends Controller
 {
@@ -19,7 +20,21 @@ class BacheController extends Controller
 
         $baches = Bache::select('id', 'latitud', 'longitud', 'referencia', 'estado_id')
             ->whereHas('estado', fn ($q) => $q->whereIn('estado', $estadosVisibles))
-            ->get();
+            ->withCount('reportes')
+            ->with(['reportes' => fn ($q) => $q->latest()->with('evidencias')])
+            ->get()
+            ->map(function (Bache $bache) {
+                $evidencia = $bache->reportes->flatMap->evidencias->first();
+
+                return [
+                    'id' => $bache->id,
+                    'latitud' => $bache->latitud,
+                    'longitud' => $bache->longitud,
+                    'referencia' => $bache->referencia,
+                    'reportes_count' => $bache->reportes_count,
+                    'foto_url' => $evidencia ? Storage::url($evidencia->ruta_imagen) : null,
+                ];
+            });
 
         return view('baches.index', compact('baches'));
     }
