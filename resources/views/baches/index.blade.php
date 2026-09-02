@@ -270,9 +270,9 @@ function bacheApp() {
         initMap() {
             this.map = L.map('map', { zoomControl: true }).setView([-17.7833, -63.1821], 13);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '© OpenStreetMap'
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(this.map);
 
             const bachesReales = {!! json_encode($baches) !!};
